@@ -1,20 +1,26 @@
 ---
 title: About monitoring and troubleshooting
 intro: 'You can use the tools in {% data variables.product.prodname_actions %} to monitor and debug your workflows.'
-product: '{% data reusables.gated-features.actions %}'
 versions:
   fpt: '*'
   ghes: '*'
   ghae: '*'
+  ghec: '*'
 shortTitle: About monitoring and troubleshooting
 miniTocMaxHeadingLevel: 3
 ---
 
 {% data reusables.actions.enterprise-beta %}
 {% data reusables.actions.enterprise-github-hosted-runners %}
-{% data reusables.actions.ae-beta %}
 
-## Monitoring your workflows
+## Monitoring your workflows 
+
+{% ifversion github-runner-dashboard %}
+### Monitoring your current jobs in your organization or enterprise
+
+{% data reusables.actions.github-hosted-runners-check-concurrency %}
+
+{% endif %}
 
 ### Using the visualization graph
 
@@ -22,7 +28,7 @@ Every workflow run generates a real-time graph that illustrates the run progress
 
    ![Workflow graph](/assets/images/help/images/workflow-graph.png)
 
-For more information, see "[Using the visualization graph](/actions/monitoring-and-troubleshooting-workflows/using-the-visualization-graph)."
+For more information, see "[Using the visualization graph](/actions/monitoring-and-troubleshooting-workflows/using-the-visualization-graph)." 
 
 ### Adding a workflow status badge
 
@@ -30,7 +36,7 @@ For more information, see "[Using the visualization graph](/actions/monitoring-a
 
 For more information, see "[Adding a workflow status badge](/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge)."
 
-{% ifversion fpt %}
+{% ifversion fpt or ghec %}
 ### Viewing job execution time
 
 To identify how long a job took to run, you can view its execution time. For example:

@@ -5,7 +5,6 @@ import { productMap } from '../lib/all-products.js'
 import pathUtils from '../lib/path-utils.js'
 import productNames from '../lib/product-names.js'
 import warmServer from '../lib/warm-server.js'
-import readJsonFile from '../lib/read-json-file.js'
 import searchVersions from '../lib/search/versions.js'
 import nonEnterpriseDefaultVersion from '../lib/non-enterprise-default-version.js'
 const activeProducts = Object.values(productMap).filter(
@@ -17,7 +16,11 @@ const {
   getCategoryStringFromPath,
   getPathWithoutLanguage,
 } = pathUtils
-const featureFlags = Object.keys(readJsonFile('./feature-flags.json'))
+
+// This doesn't change just because the request changes, so compute it once.
+const enterpriseServerVersions = Object.keys(allVersions).filter((version) =>
+  version.startsWith('enterprise-server@')
+)
 
 // Supply all route handlers with a baseline `req.context` object
 // Note that additional middleware in middleware/index.js adds to this context object
@@ -26,12 +29,7 @@ export default async function contextualize(req, res, next) {
   const { site, redirects, siteTree, pages: pageMap } = await warmServer()
 
   req.context = {}
-
-  // make feature flag environment variables accessible in layouts
   req.context.process = { env: {} }
-  featureFlags.forEach((featureFlagName) => {
-    req.context[featureFlagName] = process.env[featureFlagName]
-  })
 
   // define each context property explicitly for code-search friendliness
   // e.g. searches for "req.context.page" will include results from this file
@@ -49,26 +47,11 @@ export default async function contextualize(req, res, next) {
   req.context.languages = languages
   req.context.productNames = productNames
   req.context.enterpriseServerReleases = enterpriseServerReleases
-  req.context.enterpriseServerVersions = Object.keys(allVersions).filter((version) =>
-    version.startsWith('enterprise-server@')
-  )
+  req.context.enterpriseServerVersions = enterpriseServerVersions
   req.context.redirects = redirects
   req.context.site = site[req.language].site
   req.context.siteTree = siteTree
   req.context.pages = pageMap
-
-  // Object exposing selected variables to client
-  req.context.expose = JSON.stringify({
-    // Languages and versions for search
-    searchOptions: {
-      languages: Object.keys(languages),
-      versions: searchVersions,
-      nonEnterpriseDefaultVersion,
-    },
-    // `|| undefined` won't show at all for production
-    airgap: Boolean(process.env.AIRGAP || req.cookies.AIRGAP) || undefined,
-  })
-  if (process.env.AIRGAP || req.cookies.AIRGAP) req.context.AIRGAP = true
   req.context.searchVersions = searchVersions
   req.context.nonEnterpriseDefaultVersion = nonEnterpriseDefaultVersion
 

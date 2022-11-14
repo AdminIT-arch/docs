@@ -1,1 +1,1 @@
-Para as linguagens compiladas compatíveis, você pode usar a ação `autobuild` no {% data variables.product.prodname_codeql_workflow %} para criar o seu código. Isso evita que você tenha que especificar comandos de criação explícitos para C/C++, C#, e Java.
+For the supported compiled languages, you can use the `autobuild` action in the {% data variables.code-scanning.codeql_workflow %} to build your code. This avoids you having to specify explicit build commands for C/C++, C#,{% ifversion codeql-go-autobuild %} Go,{% endif %} and Java.
